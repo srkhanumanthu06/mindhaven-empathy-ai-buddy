@@ -1,15 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, RefreshCw, CircleEllipsis } from 'lucide-react';
-
-interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
-}
+import { toast } from '@/components/ui/sonner';
+import ApiKeyInput from './ApiKeyInput';
+import { Message, fetchAiResponse, getApiKey } from '@/services/aiService';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -22,8 +18,18 @@ const ChatInterface = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(!!getApiKey());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = () => {
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === '') return;
     
     // Add user message
@@ -38,28 +44,38 @@ const ChatInterface = () => {
     setInputMessage('');
     setIsLoading(true);
     
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const aiResponses = [
-        "I understand how you're feeling. Would you like to talk more about that?",
-        "Thank you for sharing. That sounds challenging. How can I support you today?",
-        "I'm here to listen. Could you tell me more about what's on your mind?",
-        "It's okay to feel that way. What do you think might help you feel better?",
-        "I appreciate you opening up. Is there anything specific you'd like to focus on today?"
-      ];
-      
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    try {
+      if (!getApiKey()) {
+        throw new Error('API key not found');
+      }
+
+      // Send to AI API and get response
+      const aiResponse = await fetchAiResponse([...messages, newUserMessage]);
       
       const newAiMessage: Message = {
         id: Date.now() + 1,
-        text: randomResponse,
+        text: aiResponse,
         sender: 'ai',
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, newAiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast.error('Failed to get response from AI. Please check your API key.');
+      
+      // Fallback response in case of error
+      const errorMessage: Message = {
+        id: Date.now() + 1,
+        text: "I'm having trouble connecting right now. Please check your API key or try again later.",
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -67,6 +83,10 @@ const ChatInterface = () => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleApiKeySet = () => {
+    setHasApiKey(true);
   };
 
   return (
@@ -79,15 +99,23 @@ const ChatInterface = () => {
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {!hasApiKey && (
+          <ApiKeyInput onApiKeySet={handleApiKeySet} />
+        )}
+        
         {messages.map((message) => (
           <div 
             key={message.id} 
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div 
-              className={`max-w-[80%] chat-bubble ${message.sender === 'user' ? 'user' : 'ai'}`}
+              className={`max-w-[80%] p-3 rounded-lg ${
+                message.sender === 'user' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-foreground'
+              }`}
             >
-              <p>{message.text}</p>
+              <p className="whitespace-pre-wrap">{message.text}</p>
               <div className="text-xs mt-1 opacity-70">
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
@@ -97,12 +125,14 @@ const ChatInterface = () => {
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="chat-bubble ai flex items-center space-x-2">
+            <div className="p-3 rounded-lg bg-muted text-foreground flex items-center space-x-2">
               <RefreshCw className="h-4 w-4 animate-spin" />
               <span>Thinking...</span>
             </div>
           </div>
         )}
+        
+        <div ref={messagesEndRef} />
       </div>
       
       <div className="p-4 border-t">
@@ -111,14 +141,14 @@ const ChatInterface = () => {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message here..."
+            placeholder={hasApiKey ? "Type your message here..." : "Please add your API key to start chatting"}
             className="resize-none"
-            disabled={isLoading}
+            disabled={isLoading || !hasApiKey}
             rows={2}
           />
           <Button 
             onClick={handleSendMessage} 
-            disabled={inputMessage.trim() === '' || isLoading}
+            disabled={inputMessage.trim() === '' || isLoading || !hasApiKey}
             className="self-end"
           >
             <Send className="h-4 w-4" />
