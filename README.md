@@ -1,7 +1,7 @@
 Hi, I'm @srkhanumanthu06
 I'm pursuing CSE with specialization in AI-ML at SRM University 
 
-This is a team work done by me @srkhanumanthu06 and my friend @
+This is a team work done by me @srkhanumanthu06 and my friend @divyatej-papolu
 
 
 # Welcome to our project
