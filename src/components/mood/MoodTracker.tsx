@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
-  SmilePlus, Smile, Meh, Frown, AngryFrown,
+  SmilePlus, Smile, Meh, Frown, Angry,
   Sun, CloudRain, Cloud, Zap, Calendar 
 } from 'lucide-react';
 
@@ -65,7 +65,7 @@ const MoodTracker = () => {
       case 'good': return <Smile className="w-6 h-6" />;
       case 'okay': return <Meh className="w-6 h-6" />;
       case 'bad': return <Frown className="w-6 h-6" />;
-      case 'awful': return <AngryFrown className="w-6 h-6" />;
+      case 'awful': return <Angry className="w-6 h-6" />;
     }
   };
 
