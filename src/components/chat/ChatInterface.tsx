@@ -11,7 +11,7 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello, I'm your MindHaven companion. How are you feeling today?",
+      text: "Hello, I'm your MindHaven companion powered by Hugging Face. How are you feeling today?",
       sender: 'ai',
       timestamp: new Date()
     }
@@ -92,7 +92,7 @@ const ChatInterface = () => {
   return (
     <div className="flex flex-col h-[80vh] rounded-xl border shadow-sm bg-card">
       <div className="p-4 border-b flex justify-between items-center">
-        <h2 className="font-semibold">MindHaven Chat</h2>
+        <h2 className="font-semibold">MindHaven Chat with Hugging Face</h2>
         <Button variant="ghost" size="icon">
           <CircleEllipsis className="h-5 w-5" />
         </Button>

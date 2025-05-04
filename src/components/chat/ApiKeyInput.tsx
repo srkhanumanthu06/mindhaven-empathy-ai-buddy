@@ -16,12 +16,14 @@ const ApiKeyInput = ({ onApiKeySet }: ApiKeyInputProps) => {
   const [showInput, setShowInput] = useState<boolean>(!getApiKey());
 
   const handleSaveKey = () => {
-    if (!key.trim()) {
+    if (!key.trim() && !getApiKey()) {
       toast.error('Please enter a valid API key');
       return;
     }
     
-    setApiKey(key);
+    if (key.trim()) {
+      setApiKey(key);
+    }
     setShowInput(false);
     toast.success('API key saved successfully');
     onApiKeySet();
@@ -55,7 +57,7 @@ const ApiKeyInput = ({ onApiKeySet }: ApiKeyInputProps) => {
       <CardHeader>
         <CardTitle>Connect to AI</CardTitle>
         <CardDescription>
-          Enter your OpenAI API key to enable AI chat functionality.
+          Using Hugging Face's API for chat functionality.
           Your key is stored locally in your browser and never sent to our servers.
         </CardDescription>
       </CardHeader>
@@ -65,7 +67,7 @@ const ApiKeyInput = ({ onApiKeySet }: ApiKeyInputProps) => {
             type="password"
             value={key}
             onChange={(e) => setKey(e.target.value)}
-            placeholder="Enter your OpenAI API key"
+            placeholder="Enter your Hugging Face API key"
             className="flex-1"
           />
           <Button onClick={handleSaveKey}>
@@ -78,7 +80,7 @@ const ApiKeyInput = ({ onApiKeySet }: ApiKeyInputProps) => {
         </div>
       </CardContent>
       <CardFooter className="text-xs text-muted-foreground">
-        <p>Need an API key? <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="underline">Get one from OpenAI</a></p>
+        <p>Default key is already set, or get a new one from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" className="underline">Hugging Face</a></p>
       </CardFooter>
     </Card>
   );
