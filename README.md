@@ -7,7 +7,7 @@ Unfortunately we couldn't login to Azure to access the Azure app services and Az
 So we used other cloud platform services
 
 
-# Welcome to your Lovable project
+# Welcome to our project
 
 ## Project info
 
