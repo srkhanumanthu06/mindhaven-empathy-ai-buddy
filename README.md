@@ -1,3 +1,12 @@
+Hi, I'm @srkhanumanthu06
+I'm pursuing CSE with specialization in AI-ML at SRM University 
+
+This is a team work done by me @srkhanumanthu06 and my friend @
+
+Unfortunately we couldn't login to Azure to access the Azure app services and Azure OpenAI
+So we used other cloud platform services
+
+
 # Welcome to your Lovable project
 
 ## Project info
